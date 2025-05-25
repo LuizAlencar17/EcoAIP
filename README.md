@@ -1,17 +1,4 @@
-LuizAlencar17: create a README file in my project @/home/luiz/experiments/my-repositories/EcoAIP
 
-GitHub Copilot: ### Plan:
-1. Create a `README.md` file in the specified directory.
-2. Include the following sections in the README:
-   - Project Title
-   - Description
-   - Features
-   - Installation
-   - Usage
-   - Configuration Parameters (based on the provided excerpt)
-   - License (placeholder)
-
-### Code:
 ```plaintext
 # EcoAIP
 
@@ -58,5 +45,3 @@ python train.py --config config.aip_resnet50
 ## License
 This project is licensed under the MIT License. See `LICENSE` for details.
 ```
-
-Save this content as `README.md` in `/home/luiz/experiments/my-repositories/EcoAIP`.
