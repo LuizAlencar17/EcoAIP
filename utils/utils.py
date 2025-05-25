@@ -13,7 +13,7 @@ def get_device():
 
 def load_config(config_name):
     config = importlib.import_module(config_name)
-    print("\n\nConfiguration Parameters:")
+    print("\nConfiguration Parameters:")
     for attr in dir(config):
         if not attr.startswith("__"):  # Ignore special attributes
             print(f"{attr}: {getattr(config, attr)}")

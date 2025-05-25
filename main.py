@@ -22,7 +22,7 @@ parser.add_argument(
 
 # Dynamically load the arguments
 args = parser.parse_args()
-print("Arguments:")
+print("\nArguments:")
 for key, value in vars(args).items():
     print(f"{key}: {value}")
 
@@ -42,9 +42,9 @@ transform = transforms.Compose(
 )
 
 
-train_dataset = SerengetiDataset(config.DATA_TRAIN_CSV_PATH, transform, 1000)
-val_dataset = SerengetiDataset(config.DATA_VAL_CSV_PATH, transform, 250)
-test_dataset = SerengetiDataset(config.DATA_TEST_CSV_PATH, transform, 500)
+train_dataset = SerengetiDataset(config.DATA_TRAIN_CSV_PATH, transform, 2000)
+val_dataset = SerengetiDataset(config.DATA_VAL_CSV_PATH, transform, 500)
+test_dataset = SerengetiDataset(config.DATA_TEST_CSV_PATH, transform, 750)
 
 train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
@@ -68,6 +68,7 @@ if args.mode == "train":
 if args.mode == "test":
     print("Testing model...")
     if config.WEIGHTS_PATH:
+        print("Loading weights in {config.WEIGHTS_PATH}")
         model.load_state_dict(torch.load(config.WEIGHTS_PATH), strict=False)
     accuracy = test_model(
         model=model,

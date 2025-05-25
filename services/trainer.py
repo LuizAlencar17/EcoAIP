@@ -50,7 +50,7 @@ def train_model(
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
 
-            data_aug = torch.stack([augment_image(img) for img in data])
+            # data_aug = torch.stack([augment_image(img) for img in data])
             data_aug = data
             if loss_computation == "augment":
                 outputs, x_dip = model(data_aug)
