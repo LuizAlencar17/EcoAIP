@@ -91,7 +91,6 @@ class DIP(nn.Module):
         x = x * wb
 
         # Tone adjustment (simplified)
-        # x = x * tone
         x = self.tone_mapping(x, tone.squeeze(-1).squeeze(-1))
 
         # Sharpening

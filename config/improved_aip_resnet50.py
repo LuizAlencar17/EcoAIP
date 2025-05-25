@@ -7,7 +7,7 @@ DATA_TEST_CSV_PATH = (
 )
 WEIGHTS_PATH = "/data/luiz/dataset/EcoAIP/ImprovedAIPResNet50/model_best.pth"
 MODEL = "ImprovedAIPResNet50"
-LOSS_COMPUTATION = "augment"
+LOSS_COMPUTATION = "normal"
 OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/"
 PATIENCE = 10
 BATCH_SIZE = 16
