@@ -1,5 +1,4 @@
 
-```plaintext
 # EcoAIP
 
 EcoAIP is a machine learning project designed for animal classification using the AIPResNet50 model. It leverages a ResNet50-based architecture to process Serengeti dataset partitions for training, validation, and testing.
@@ -44,4 +43,3 @@ python train.py --config config.aip_resnet50
 
 ## License
 This project is licensed under the MIT License. See `LICENSE` for details.
-```
