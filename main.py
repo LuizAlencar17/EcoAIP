@@ -42,9 +42,9 @@ transform = transforms.Compose(
 )
 
 
-train_dataset = SerengetiDataset(config.DATA_TRAIN_CSV_PATH, transform, 2000)
-val_dataset = SerengetiDataset(config.DATA_VAL_CSV_PATH, transform, 500)
-test_dataset = SerengetiDataset(config.DATA_TEST_CSV_PATH, transform, 1500)
+train_dataset = SerengetiDataset(config.DATA_TRAIN_CSV_PATH, transform, 10000)
+val_dataset = SerengetiDataset(config.DATA_VAL_CSV_PATH, transform, 1000)
+test_dataset = SerengetiDataset(config.DATA_TEST_CSV_PATH, transform, 5000)
 
 train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)

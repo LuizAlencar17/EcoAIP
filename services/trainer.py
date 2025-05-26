@@ -50,8 +50,8 @@ def train_model(
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
 
-            # data_aug = torch.stack([augment_image(img) for img in data])
-            data_aug = data
+            data_aug = torch.stack([augment_image(img) for img in data])
+            # data_aug = data
             if loss_computation == "augment":
                 outputs, x_dip = model(data_aug)
                 loss = multi_objective_loss(outputs, target, x_dip, data_aug, criterion)
@@ -82,7 +82,7 @@ def train_model(
             current_patience += 1
             print(f"Patience {current_patience}/{patience}")
             if current_patience >= patience:
-                print("Early stopping triggered")
+                print(f"Early stopping triggered, best accuracy{best_acc}")
                 break
 
     save_metrics(

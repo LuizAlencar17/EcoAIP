@@ -10,7 +10,7 @@ def get_resnet50() -> nn.Module:
 
 
 def get_resnet50_classifier(num_classes: int = 2) -> nn.Module:
-    model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+    model = get_resnet50()
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, num_classes)
     return model
