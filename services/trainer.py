@@ -1,17 +1,9 @@
 import torch
-import torch.nn.functional as F
 from tqdm import tqdm
 from typing import Any
 from utils.utils import save_metrics
 from services.tester import test_model
 from torchvision.transforms import functional as TF
-
-
-def multi_objective_loss(pred, target, x_dip, x_orig, criterion):
-    loss_task = criterion(pred, target)
-    loss_rec = F.l1_loss(x_dip, x_orig)
-    perceptual_loss = F.mse_loss(F.avg_pool2d(x_dip, 4), F.avg_pool2d(x_orig, 4))
-    return loss_task + 0.1 * loss_rec + 0.05 * perceptual_loss
 
 
 def augment_image(x):
@@ -33,12 +25,11 @@ def train_model(
     output_dir: str,
     device: torch.device,
     optimizer: Any,
-    loss_computation: str,
 ):
-
+    if patience > epochs:
+        patience = epochs - 1
     criterion = torch.nn.CrossEntropyLoss()
-
-    best_acc = 0.0
+    best_acc = -1
     current_patience = 0
     train_losses, acc_values = [], []
 
@@ -51,20 +42,15 @@ def train_model(
             optimizer.zero_grad()
 
             data_aug = torch.stack([augment_image(img) for img in data])
-            # data_aug = data
-            if loss_computation == "augment":
-                outputs, x_dip = model(data_aug)
-                loss = multi_objective_loss(outputs, target, x_dip, data_aug, criterion)
-            else:
-                outputs = model(data_aug)
-                loss = criterion(outputs, target)
+            outputs = model(data_aug)
+            loss = criterion(outputs, target)
 
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
 
         avg_train_loss = running_loss / len(train_loader)
-        val_acc = test_model(model, val_loader, device, loss_computation)
+        val_acc = test_model(model, val_loader, device)
 
         train_losses.append(loss.item())
         acc_values.append(val_acc)
@@ -74,10 +60,13 @@ def train_model(
         )
 
         if val_acc > best_acc:
-            print(f"New best model with accuracy: {val_acc:.4f}, saving model...")
+            model_path = f"{output_dir}/model_best.pth"
+            print(
+                f"New best model with accuracy: {val_acc:.4f}, saving model... {model_path}"
+            )
             best_acc = val_acc
             current_patience = 0
-            torch.save(model.state_dict(), f"{output_dir}/model_best.pth")
+            torch.save(model.state_dict(), model_path)
         else:
             current_patience += 1
             print(f"Patience {current_patience}/{patience}")

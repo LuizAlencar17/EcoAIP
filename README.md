@@ -71,7 +71,7 @@ python train.py --config config.aip_resnet50
 - **EPOCHS**: 100
 - **IMAGE_SIZE**: (300, 300)
 - **LEARNING_RATE_MODEL**: 0.001
-- **LOSS_COMPUTATION**: normal
+- **model_name**: normal
 - **MODEL**: AIPResNet50
 - **OUTPUT_DIR**: `/data/luiz/dataset/EcoAIP/`
 - **PATIENCE**: 10

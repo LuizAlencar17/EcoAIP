@@ -6,7 +6,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from utils.utils import get_device, load_config
 from models.loader import get_model
-from data.serengeti_dataset import SerengetiDataset
+from data.animal_dataset import AnimalDataset
 from services.trainer import train_model
 from services.tester import test_model
 from utils.seed import set_seed
@@ -31,7 +31,7 @@ config = load_config(args.config)
 device = get_device()
 
 set_seed(config.SEED)
-path_output = f"{config.OUTPUT_DIR}{config.MODEL}"
+path_output = f"{config.OUTPUT_DIR}/{config.MODEL}_{config.TRAIN_SIZE}"
 os.makedirs(path_output, exist_ok=True)
 
 transform = transforms.Compose(
@@ -42,9 +42,9 @@ transform = transforms.Compose(
 )
 
 
-train_dataset = SerengetiDataset(config.DATA_TRAIN_CSV_PATH, transform, 10000)
-val_dataset = SerengetiDataset(config.DATA_VAL_CSV_PATH, transform, 1000)
-test_dataset = SerengetiDataset(config.DATA_TEST_CSV_PATH, transform, 5000)
+train_dataset = AnimalDataset(config.DATA_TRAIN_CSV_PATH, transform, config.TRAIN_SIZE)
+val_dataset = AnimalDataset(config.DATA_VAL_CSV_PATH, transform, 400)
+test_dataset = AnimalDataset(config.DATA_TEST_CSV_PATH, transform, 400)
 
 train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
@@ -62,19 +62,17 @@ if args.mode == "train":
         output_dir=path_output,
         optimizer=optimizer,
         device=device,
-        loss_computation=config.LOSS_COMPUTATION,
     )
 
 if args.mode == "test":
     print("Testing model...")
-    if config.WEIGHTS_PATH:
-        print(f"Loading weights in {config.WEIGHTS_PATH}")
-        model.load_state_dict(torch.load(config.WEIGHTS_PATH), strict=False)
+    weights_path = f"{path_output}/model_best.pth"
+    print(f"Loading weights in {weights_path}")
+    model.load_state_dict(torch.load(weights_path), strict=False)
     accuracy = test_model(
         model=model,
         test_loader=test_loader,
         device=device,
-        loss_computation=config.LOSS_COMPUTATION,
         output_dir=path_output,
     )
     print(f"Accuracy: {accuracy:.2f}")

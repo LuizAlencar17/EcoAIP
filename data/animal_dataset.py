@@ -5,7 +5,7 @@ from torchvision import transforms
 from typing import Optional
 
 
-class SerengetiDataset(Dataset):
+class AnimalDataset(Dataset):
     def __init__(
         self,
         csv_file: str,
@@ -16,7 +16,9 @@ class SerengetiDataset(Dataset):
             pd.read_csv(csv_file).sample(n=n, random_state=42).reset_index(drop=True)
         )
         self.transform = transform
-        self.data_frame["label"] = self.data_frame["category"].map({"yes": 1, "no": 0})
+        self.data_frame["label"] = self.data_frame["category"].map(
+            lambda a: int(a != 0)
+        )
 
     def __len__(self) -> int:
         return len(self.data_frame)

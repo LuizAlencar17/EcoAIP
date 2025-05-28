@@ -6,9 +6,9 @@ DATA_TEST_CSV_PATH = (
     "/data/luiz/dataset/partitions/animal-classifier/serengeti/test.csv"
 )
 WEIGHTS_PATH = "/data/luiz/dataset/EcoAIP/AIPResNet50/model_best.pth"
-LOSS_COMPUTATION = "normal"
+MODEL_NAME = "normal"
 MODEL = "AIPResNet50"
-OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/"
+OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/serengeti"
 PATIENCE = 20
 BATCH_SIZE = 16
 EPOCHS = 100
