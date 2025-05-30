@@ -3,11 +3,11 @@ DATA_TRAIN_CSV_PATH = (
 )
 DATA_VAL_CSV_PATH = "/data/luiz/dataset/partitions/animal-classifier/caltech/val.csv"
 DATA_TEST_CSV_PATH = "/data/luiz/dataset/partitions/animal-classifier/caltech/test.csv"
-MODEL = "ImprovedAIPResNet50"
 MODEL_NAME = "normal"
+MODEL = "AIPResNet50"
 OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/caltech"
 PATIENCE = 20
-TRAIN_SIZE = 4800
+TRAIN_SIZE = 9600
 BATCH_SIZE = 16
 EPOCHS = 100
 LEARNING_RATE_MODEL = 0.001

@@ -71,7 +71,7 @@ def train_model(
             current_patience += 1
             print(f"Patience {current_patience}/{patience}")
             if current_patience >= patience:
-                print(f"Early stopping triggered, best accuracy{best_acc}")
+                print(f"Early stopping triggered, best accuracy: {best_acc}")
                 break
 
     save_metrics(
