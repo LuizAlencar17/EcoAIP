@@ -6,7 +6,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from utils.utils import get_device, load_config
 from models.loader import get_model
-from data.animal_dataset import AnimalDataset
+from data.dataset import AnimalDataset
 from services.trainer import train_model
 from services.tester import test_model
 from utils.seed import set_seed
@@ -31,7 +31,7 @@ config = load_config(args.config)
 device = get_device()
 
 set_seed(config.SEED)
-path_output = f"{config.OUTPUT_DIR}/{config.MODEL}_{config.TRAIN_SIZE}"
+path_output = f"{config.OUTPUT_DIR}/{config.TASK}/{config.MODEL}_{config.TRAIN_SIZE}"
 os.makedirs(path_output, exist_ok=True)
 
 transform = transforms.Compose(
@@ -50,7 +50,7 @@ train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=T
 val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
 
-model, optimizer = get_model(config, device)
+model, optimizer = get_model(config, device, config.NUM_CLASS)
 if args.mode == "train":
     print("Tranning model...")
     train_model(
