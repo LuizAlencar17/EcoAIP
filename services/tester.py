@@ -19,20 +19,20 @@ def test_model(
     predictions = []  # List to store predictions and labels
 
     with torch.no_grad():
-        for idx, (images, labels) in enumerate(tqdm(test_loader)):
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
+        for idx, (data, target) in enumerate(tqdm(test_loader)):
+            data, target = data.to(device), target.to(device)
+            outputs = model(data)
             _, predicted = torch.max(outputs, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            total += target.size(0)
+            correct += (predicted == target).sum().item()
 
             # Save predictions and labels
-            for i in range(len(labels)):
+            for i in range(len(target)):
                 predictions.append(
                     {
-                        "image_index": idx * len(labels) + i,
+                        "image_index": idx * len(target) + i,
                         "pred": predicted[i].item(),
-                        "true": labels[i].item(),
+                        "true": target[i].item(),
                     }
                 )
     if output_dir:

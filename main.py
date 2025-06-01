@@ -35,13 +35,8 @@ path_output = f"{config.OUTPUT_DIR}/{config.TASK}/{config.MODEL}_{config.TRAIN_S
 os.makedirs(path_output, exist_ok=True)
 
 transform = transforms.Compose(
-    [
-        transforms.Resize(config.IMAGE_SIZE),
-        transforms.ToTensor(),
-    ]
+    [transforms.Resize(config.IMAGE_SIZE), transforms.ToTensor()]
 )
-
-
 train_dataset = AnimalDataset(config.DATA_TRAIN_CSV_PATH, transform, config.TRAIN_SIZE)
 val_dataset = AnimalDataset(config.DATA_VAL_CSV_PATH, transform, 400)
 test_dataset = AnimalDataset(config.DATA_TEST_CSV_PATH, transform, 400)
@@ -61,6 +56,7 @@ if args.mode == "train":
         patience=config.PATIENCE,
         output_dir=path_output,
         optimizer=optimizer,
+        apply_augment=config.AUGMENT_IMAGE,
         device=device,
     )
 

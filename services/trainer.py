@@ -24,6 +24,7 @@ def train_model(
     patience: int,
     output_dir: str,
     device: torch.device,
+    apply_augment: bool,
     optimizer: Any,
 ):
     if patience > epochs:
@@ -31,32 +32,44 @@ def train_model(
     criterion = torch.nn.CrossEntropyLoss()
     best_acc = -1
     current_patience = 0
-    train_losses, acc_values = [], []
+    train_losses, train_accs, acc_values = [], [], []
 
     for epoch in range(epochs):
         model.train()
         running_loss = 0.0
+        correct = 0
+        total = 0
         desc = f"Epoch {epoch+1}/{epochs}"
         for data, target in tqdm(train_loader, desc=desc):
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
-
-            data_aug = torch.stack([augment_image(img) for img in data])
+            # Apply augmentation if specified
+            if apply_augment:
+                data_aug = torch.stack([augment_image(img) for img in data])
+            else:
+                data_aug = data
             outputs = model(data_aug)
             loss = criterion(outputs, target)
+
+            _, predicted = torch.max(outputs, 1)
+            total += target.size(0)
+            correct += (predicted == target).sum().item()
 
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
 
         avg_train_loss = running_loss / len(train_loader)
+        train_acc = correct / total
+
         val_acc = test_model(model, val_loader, device)
 
         train_losses.append(loss.item())
         acc_values.append(val_acc)
+        train_accs.append(train_acc)
 
         print(
-            f"Epoch {epoch+1}: Train Loss={avg_train_loss:.10f}, Val Acc={val_acc:.4f}"
+            f"Epoch {epoch+1}: Train Loss={avg_train_loss:.10f}, Train Acc={train_acc:.10f}, Val Acc={val_acc:.4f}"
         )
 
         if val_acc > best_acc:
@@ -78,6 +91,7 @@ def train_model(
         {
             "train_loss": train_losses,
             "val_accuracy": acc_values,
+            "train_accuracy": train_accs,
         },
         f"{output_dir}/metrics.csv",
     )

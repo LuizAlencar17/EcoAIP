@@ -6,6 +6,8 @@ from torchvision.models import ResNet50_Weights
 
 def get_resnet50() -> nn.Module:
     model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+    for param in model.parameters():
+        param.requires_grad = False  # Freeze base layers
     return model
 
 
