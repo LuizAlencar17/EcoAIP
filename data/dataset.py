@@ -11,9 +11,10 @@ class AnimalDataset(Dataset):
         csv_file: str,
         transform: Optional[transforms.Compose] = None,
         n: int = 1000,
+        seed: int = 42,
     ):
         self.data_frame = (
-            pd.read_csv(csv_file).sample(n=n, random_state=42).reset_index(drop=True)
+            pd.read_csv(csv_file).sample(n=n, random_state=seed).reset_index(drop=True)
         )
         self.transform = transform
         self.data_frame["label"] = self.data_frame["category"]

@@ -14,7 +14,5 @@ def get_model(config, device, num_classes: int = 2):
     elif config.MODEL == "ResNet50":
         model = get_resnet50_classifier(num_classes)
 
-    optimizer = optim.Adam(
-        model.parameters(), lr=config.LEARNING_RATE_MODEL, weight_decay=1e-5
-    )
+    optimizer = optim.Adam(model.parameters(), lr=config.LEARNING_RATE_MODEL)
     return model.to(device), optimizer

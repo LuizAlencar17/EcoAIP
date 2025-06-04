@@ -37,9 +37,11 @@ os.makedirs(path_output, exist_ok=True)
 transform = transforms.Compose(
     [transforms.Resize(config.IMAGE_SIZE), transforms.ToTensor()]
 )
-train_dataset = AnimalDataset(config.DATA_TRAIN_CSV_PATH, transform, config.TRAIN_SIZE)
-val_dataset = AnimalDataset(config.DATA_VAL_CSV_PATH, transform, 400)
-test_dataset = AnimalDataset(config.DATA_TEST_CSV_PATH, transform, 400)
+train_dataset = AnimalDataset(
+    config.DATA_TRAIN_CSV_PATH, transform, config.TRAIN_SIZE, config.SEED
+)
+val_dataset = AnimalDataset(config.DATA_VAL_CSV_PATH, transform, 400, config.SEED)
+test_dataset = AnimalDataset(config.DATA_TEST_CSV_PATH, transform, 400, config.SEED)
 
 train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
