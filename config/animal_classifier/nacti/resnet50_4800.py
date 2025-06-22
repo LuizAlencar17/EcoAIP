@@ -1,0 +1,16 @@
+DATA_TRAIN_CSV_PATH = "/data/luiz/dataset/partitions/animal-classifier/nacti/train.csv"
+DATA_VAL_CSV_PATH = "/data/luiz/dataset/partitions/animal-classifier/nacti/val.csv"
+DATA_TEST_CSV_PATH = "/data/luiz/dataset/partitions/animal-classifier/nacti/test.csv"
+MODEL = "ResNet50"
+MODEL_NAME = "normal"
+OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/nacti"
+PATIENCE = 8
+NUM_CLASS = 2
+TRAIN_SIZE = 4800
+BATCH_SIZE = 16
+AUGMENT_IMAGE = True
+EPOCHS = 40
+TASK = "animal-classifier"
+LEARNING_RATE_MODEL = 1e-4
+IMAGE_SIZE = (224, 224)
+SEED = 42
