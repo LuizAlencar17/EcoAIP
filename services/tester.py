@@ -38,4 +38,4 @@ def test_model(
     if output_dir:
         save_metrics(predictions, f"{output_dir}/eval_results.csv")
     accuracy = correct / total
-    return accuracy
+    return 0, accuracy

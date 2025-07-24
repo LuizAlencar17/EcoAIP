@@ -1,76 +1,161 @@
 import os
 import torch
 import argparse
-
-from torchvision import transforms
+from pathlib import Path
 from torch.utils.data import DataLoader
+from data.classification import ClassificationDataset
+from data.detectation import DetectionDataset
 from utils.utils import get_device, load_config
 from models.loader import get_model
-from data.dataset import AnimalDataset
+from services.yolo_trainer import train_yolo_model
+from services.yolo_tester import test_yolo_model
 from services.trainer import train_model
 from services.tester import test_model
 from utils.seed import set_seed
 
 
-parser = argparse.ArgumentParser(description="")
-parser.add_argument(
-    "--config", type=str, required=True, help="Name of the config file (without .py)"
-)
-parser.add_argument(
-    "--mode", type=str, required=False, default="train", help="Train or test?"
-)
+def detection_collate_fn(batch):
+    images = []
+    targets = []
 
-# Dynamically load the arguments
-args = parser.parse_args()
-print("\nArguments:")
-for key, value in vars(args).items():
-    print(f"{key}: {value}")
+    for img, target in batch:
+        images.append(img)
+        targets.append(target)
 
-# Dynamically load the configuration
-config = load_config(args.config)
-device = get_device()
+    images = torch.stack(images, dim=0)  # this works since image sizes are fixed
+    return images, targets
 
-set_seed(config.SEED)
-path_output = f"{config.OUTPUT_DIR}/{config.TASK}/{config.MODEL}_{config.TRAIN_SIZE}"
-os.makedirs(path_output, exist_ok=True)
 
-transform = transforms.Compose(
-    [transforms.Resize(config.IMAGE_SIZE), transforms.ToTensor()]
-)
-train_dataset = AnimalDataset(
-    config.DATA_TRAIN_CSV_PATH, transform, config.TRAIN_SIZE, config.SEED
-)
-val_dataset = AnimalDataset(config.DATA_VAL_CSV_PATH, transform, 400, config.SEED)
-test_dataset = AnimalDataset(config.DATA_TEST_CSV_PATH, transform, 400, config.SEED)
+def setup_dataloaders(config, task_type):
+    """Encapsulates the creation of datasets and dataloaders to avoid repetition."""
+    print("debug 1", task_type)
+    if task_type in [
+        "animal-classifier",
+        "species-classifier",
+        "species-classifier-cropped",
+    ]:
+        DatasetClass = ClassificationDataset
+        collate_fn = None
+        print("debug 2", task_type)
+    else:
+        DatasetClass = DetectionDataset
+        # We assume the default collate_fn is sufficient if the dataset returns fixed-size tensors.
+        # If not, a custom collate_fn should be passed here.
+        collate_fn = detection_collate_fn
+        print("debug 3", task_type)
 
-train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
-test_loader = DataLoader(test_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
+    # Common DataLoader parameters
+    loader_params = {
+        "batch_size": config.BATCH_SIZE,
+        "num_workers": 4,
+        "pin_memory": True,
+    }
 
-model, optimizer = get_model(config, device, config.NUM_CLASS)
-if args.mode == "train":
-    print("Tranning model...")
-    train_model(
-        model=model,
-        train_loader=train_loader,
-        val_loader=val_loader,
-        epochs=config.EPOCHS,
-        patience=config.PATIENCE,
-        output_dir=path_output,
-        optimizer=optimizer,
-        apply_augment=config.AUGMENT_IMAGE,
-        device=device,
+    train_dataset = DatasetClass(
+        csv_file=config.DATA_TRAIN_CSV_PATH,
+        img_size=config.IMAGE_SIZE,
+        n=config.TRAIN_SIZE,
+        seed=config.SEED,
+        is_train=True,
+        bbox_is_normalized=config.BBOX_IS_NORMALIZED,
+    )
+    val_dataset = DatasetClass(
+        csv_file=config.DATA_VAL_CSV_PATH,
+        img_size=config.IMAGE_SIZE,
+        n=config.VAL_SIZE,
+        seed=config.SEED,
+        bbox_is_normalized=config.BBOX_IS_NORMALIZED,
+    )
+    test_dataset = DatasetClass(
+        csv_file=config.DATA_TEST_CSV_PATH,
+        img_size=config.IMAGE_SIZE,
+        n=config.TEST_SIZE,
+        seed=config.SEED,
+        bbox_is_normalized=config.BBOX_IS_NORMALIZED,
+    )
+    train_loader = DataLoader(
+        train_dataset, shuffle=True, **loader_params, collate_fn=collate_fn
     )
 
-if args.mode == "test":
-    print("Testing model...")
-    weights_path = f"{path_output}/model_best.pth"
-    print(f"Loading weights in {weights_path}")
-    model.load_state_dict(torch.load(weights_path), strict=False)
-    accuracy = test_model(
-        model=model,
-        test_loader=test_loader,
-        device=device,
-        output_dir=path_output,
+    val_loader = DataLoader(
+        val_dataset, shuffle=False, **loader_params, collate_fn=collate_fn
     )
-    print(f"Accuracy: {accuracy:.2f}")
+
+    test_loader = DataLoader(
+        test_dataset, shuffle=False, **loader_params, collate_fn=collate_fn
+    )
+
+    return train_loader, val_loader, test_loader
+
+
+def main(args):
+    """Main function that runs the train or test workflow."""
+    # Load configuration and set device
+    print("\nArguments:", args)
+    config = load_config(args.config)
+    device = get_device()
+    set_seed(config.SEED)
+
+    # Create the output directory robustly with pathlib
+    output_path = (
+        Path(config.OUTPUT_DIR) / config.TASK / f"{config.MODEL}_{config.TRAIN_SIZE}"
+    )
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    # Set up the DataLoaders
+    train_loader, val_loader, test_loader = setup_dataloaders(config, config.TASK)
+
+    # Load the model and optimizer
+    model, optimizer = get_model(config, device, config.NUM_CLASS)
+
+    if args.mode == "train":
+        print("\nTraining model...")
+        trainer_fn = train_yolo_model if "yolo" in config.MODEL.lower() else train_model
+        trainer_fn(
+            model=model,
+            train_loader=train_loader,
+            val_loader=val_loader,
+            epochs=config.EPOCHS,
+            patience=config.PATIENCE,
+            output_dir=str(output_path),
+            optimizer=optimizer,
+            device=device,
+            num_classes=config.NUM_CLASS,
+        )
+
+    elif args.mode == "test":
+        print("\nTesting model...")
+        weights_path = output_path / "best_model.pth"
+        print(f"Loading weights from {weights_path}")
+
+        model.load_state_dict(torch.load(weights_path), strict=False)
+        tester_fn = test_yolo_model if "yolo" in config.MODEL.lower() else test_model
+        _, metrics = tester_fn(
+            model=model,
+            test_loader=test_loader,
+            device=device,
+            output_dir=str(output_path),
+        )
+        print(f"Test result: {metrics}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Train or test a computer vision model."
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        required=True,
+        help="Name of the config file (e.g., 'configs.yolo_config').",
+    )
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="train",
+        choices=["train", "test"],
+        help="Execution mode: train or test.",
+    )
+
+    cli_args = parser.parse_args()
+    main(cli_args)

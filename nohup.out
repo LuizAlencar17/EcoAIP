@@ -1,24 +1,253 @@
 
-Arguments:
-config: config.animal_classifier.nacti.aip_resnet50_1200
-mode: train
+Arguments: Namespace(config='config.species_classifier_cropped.serengeti.resnet50_4800', mode='train')
 
 Configuration Parameters:
-AUGMENT_IMAGE: True
 BATCH_SIZE: 16
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/animal-classifier/nacti/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/animal-classifier/nacti/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/animal-classifier/nacti/val.csv
-EPOCHS: 40
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: ResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Training model...
+Epoch 1/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2:  33%|███▎      | 1/3 [00:01<00:03,  1.58s/it]Epoch 1/2: 100%|██████████| 3/3 [00:01<00:00,  1.77it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  4.66it/s]100%|██████████| 1/1 [00:00<00:00,  4.13it/s]
+Epoch 1: Train Loss=2.2989932696, Train Acc=0.1458333333, Val Acc=0.0000
+New best model with accuracy: 0.0000, saving model... /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/ResNet50_48/best_model.pth
+Epoch 2/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2:  33%|███▎      | 1/3 [00:00<00:00,  3.45it/s]Epoch 2/2: 100%|██████████| 3/3 [00:00<00:00,  7.40it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  4.78it/s]100%|██████████| 1/1 [00:00<00:00,  4.26it/s]
+Epoch 2: Train Loss=2.2712020874, Train Acc=0.1250000000, Val Acc=0.0625
+New best model with accuracy: 0.0625, saving model... /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/ResNet50_48/best_model.pth
+
+Arguments: Namespace(config='config.species_classifier_cropped.serengeti.aip_resnet50_4800', mode='train')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/val.csv
+EPOCHS: 2
 IMAGE_SIZE: (224, 224)
 LEARNING_RATE_MODEL: 0.0001
 MODEL: AIPResNet50
-MODEL_NAME: normal
-NUM_CLASS: 2
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/nacti
-PATIENCE: 8
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
+PATIENCE: 20
 SEED: 42
-TASK: animal-classifier
-TRAIN_SIZE: 1200
-Tranning model...
-Epoch 1/40:   0%|          | 0/75 [00:00<?, ?it/s]Epoch 1/40:   1%|▏         | 1/75 [00:02<03:22,  2.74s/it]Epoch 1/40:   3%|▎         | 2/75 [00:04<02:23,  1.97s/it]Epoch 1/40:   4%|▍         | 3/75 [00:05<02:11,  1.83s/it]Epoch 1/40:   5%|▌         | 4/75 [00:06<01:44,  1.47s/it]Epoch 1/40:   7%|▋         | 5/75 [00:07<01:20,  1.15s/it]Epoch 1/40:   8%|▊         | 6/75 [00:08<01:13,  1.06s/it]Epoch 1/40:   9%|▉         | 7/75 [00:09<01:25,  1.26s/it]Epoch 1/40:  11%|█         | 8/75 [00:11<01:24,  1.27s/it]Epoch 1/40:  12%|█▏        | 9/75 [00:12<01:29,  1.35s/it]Epoch 1/40:  13%|█▎        | 10/75 [00:13<01:23,  1.28s/it]Epoch 1/40:  15%|█▍        | 11/75 [00:15<01:31,  1.43s/it]Epoch 1/40:  16%|█▌        | 12/75 [00:17<01:34,  1.50s/it]Epoch 1/40:  17%|█▋        | 13/75 [00:18<01:30,  1.46s/it]Epoch 1/40:  19%|█▊        | 14/75 [00:20<01:28,  1.46s/it]Epoch 1/40:  20%|██        | 15/75 [00:21<01:22,  1.38s/it]
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Training model...
+Epoch 1/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2:  33%|███▎      | 1/3 [00:01<00:03,  1.60s/it]Epoch 1/2: 100%|██████████| 3/3 [00:01<00:00,  1.74it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  4.64it/s]100%|██████████| 1/1 [00:00<00:00,  4.13it/s]
+Epoch 1: Train Loss=2.3296408653, Train Acc=0.0625000000, Val Acc=0.0000
+New best model with accuracy: 0.0000, saving model... /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/AIPResNet50_48/best_model.pth
+Epoch 2/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2:  33%|███▎      | 1/3 [00:00<00:00,  3.69it/s]Epoch 2/2: 100%|██████████| 3/3 [00:00<00:00,  7.72it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  4.81it/s]100%|██████████| 1/1 [00:00<00:00,  4.29it/s]
+Epoch 2: Train Loss=2.2888999780, Train Acc=0.1666666667, Val Acc=0.0000
+Patience 1/1
+Early stopping triggered, best accuracy: 0.0
+
+Arguments: Namespace(config='config.species_classifier_cropped.serengeti.improved_aip_resnet50_4800', mode='train')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: ImprovedAIPResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Training model...
+Epoch 1/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2:  33%|███▎      | 1/3 [00:01<00:03,  1.97s/it]Epoch 1/2:  67%|██████▋   | 2/3 [00:02<00:00,  1.13it/s]Epoch 1/2: 100%|██████████| 3/3 [00:02<00:00,  1.87it/s]Epoch 1/2: 100%|██████████| 3/3 [00:02<00:00,  1.35it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  4.41it/s]100%|██████████| 1/1 [00:00<00:00,  3.91it/s]
+Epoch 1: Train Loss=2.2966601054, Train Acc=0.1458333333, Val Acc=0.1250
+New best model with accuracy: 0.1250, saving model... /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/ImprovedAIPResNet50_48/best_model.pth
+Epoch 2/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2:  33%|███▎      | 1/3 [00:00<00:00,  3.05it/s]Epoch 2/2:  67%|██████▋   | 2/3 [00:00<00:00,  4.89it/s]Epoch 2/2: 100%|██████████| 3/3 [00:00<00:00,  6.05it/s]Epoch 2/2: 100%|██████████| 3/3 [00:00<00:00,  5.07it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  4.48it/s]100%|██████████| 1/1 [00:00<00:00,  4.00it/s]
+Epoch 2: Train Loss=2.2928981781, Train Acc=0.1250000000, Val Acc=0.0625
+Patience 1/1
+Early stopping triggered, best accuracy: 0.125
+
+Arguments: Namespace(config='config.species_classifier_cropped.serengeti.resnet50_4800', mode='test')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: ResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Testing model...
+Loading weights from /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/ResNet50_48/best_model.pth
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.34s/it]100%|██████████| 1/1 [00:01<00:00,  1.37s/it]
+Test result: 0.0625
+
+Arguments: Namespace(config='config.species_classifier_cropped.serengeti.aip_resnet50_4800', mode='test')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: AIPResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Testing model...
+Loading weights from /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/AIPResNet50_48/best_model.pth
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.34s/it]100%|██████████| 1/1 [00:01<00:00,  1.36s/it]
+Test result: 0.0
+
+Arguments: Namespace(config='config.species_classifier_cropped.serengeti.improved_aip_resnet50_4800', mode='test')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/serengeti/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: ImprovedAIPResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Testing model...
+Loading weights from /data/luiz/dataset/EcoAIP/serengeti/species-classifier-cropped/ImprovedAIPResNet50_48/best_model.pth
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.34s/it]100%|██████████| 1/1 [00:01<00:00,  1.36s/it]
+Test result: 0.1875
+
+Arguments: Namespace(config='config.species_classifier_cropped.caltech.resnet50_4800', mode='train')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/caltech/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/caltech/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/caltech/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: ResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/caltech
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Training model...
+Epoch 1/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2:  33%|███▎      | 1/3 [00:01<00:03,  1.92s/it]Epoch 1/2: 100%|██████████| 3/3 [00:02<00:00,  1.48it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  1.82it/s]100%|██████████| 1/1 [00:00<00:00,  1.71it/s]
+Epoch 1: Train Loss=2.2995134989, Train Acc=0.0625000000, Val Acc=0.0000
+New best model with accuracy: 0.0000, saving model... /data/luiz/dataset/EcoAIP/caltech/species-classifier-cropped/ResNet50_48/best_model.pth
+Epoch 2/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2:  33%|███▎      | 1/3 [00:00<00:01,  1.69it/s]Epoch 2/2: 100%|██████████| 3/3 [00:00<00:00,  4.25it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  1.95it/s]100%|██████████| 1/1 [00:00<00:00,  1.82it/s]
+Epoch 2: Train Loss=2.2808338801, Train Acc=0.1041666667, Val Acc=0.0000
+Patience 1/1
+Early stopping triggered, best accuracy: 0.0
+
+Arguments: Namespace(config='config.species_classifier_cropped.caltech.aip_resnet50_4800', mode='train')
+
+Configuration Parameters:
+BATCH_SIZE: 16
+BBOX_IS_NORMALIZED: False
+DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/caltech/test.csv
+DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/caltech/train.csv
+DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/species-classifier-cropped/caltech/val.csv
+EPOCHS: 2
+IMAGE_SIZE: (224, 224)
+LEARNING_RATE_MODEL: 0.0001
+MODEL: AIPResNet50
+NUM_CLASS: 10
+OUTPUT_DIR: /data/luiz/dataset/EcoAIP/caltech
+PATIENCE: 20
+SEED: 42
+TASK: species-classifier-cropped
+TEST_SIZE: 16
+TRAIN_SIZE: 48
+VAL_SIZE: 16
+debug 1 species-classifier-cropped
+debug 2 species-classifier-cropped
+
+Training model...
+Epoch 1/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2:  33%|███▎      | 1/3 [00:01<00:03,  1.93s/it]Epoch 1/2: 100%|██████████| 3/3 [00:02<00:00,  1.47it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  1.90it/s]100%|██████████| 1/1 [00:00<00:00,  1.81it/s]
+Epoch 1: Train Loss=2.3009371758, Train Acc=0.1250000000, Val Acc=0.0000
+New best model with accuracy: 0.0000, saving model... /data/luiz/dataset/EcoAIP/caltech/species-classifier-cropped/AIPResNet50_48/best_model.pth
+Epoch 2/2:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2:  33%|███▎      | 1/3 [00:00<00:01,  1.66it/s]Epoch 2/2: 100%|██████████| 3/3 [00:00<00:00,  4.16it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  1.89it/s]100%|██████████| 1/1 [00:00<00:00,  1.80it/s]
+Epoch 2: Train Loss=2.2858697573, Train Acc=0.1666666667, Val Acc=0.0000
+Patience 1/1
+Early stopping triggered, best accuracy: 0.0

@@ -6,16 +6,6 @@ from services.tester import test_model
 from torchvision.transforms import functional as TF
 
 
-def augment_image(x):
-    if torch.rand(1).item() > 0.5:
-        x = TF.adjust_gamma(x, gamma=torch.empty(1).uniform_(0.3, 2.0).item())
-    if torch.rand(1).item() > 0.5:
-        x = TF.gaussian_blur(x, kernel_size=[3, 3])
-    if torch.rand(1).item() > 0.5:
-        x = x + torch.randn_like(x) * 0.05
-    return torch.clamp(x, 0, 1)
-
-
 def train_model(
     model: Any,
     train_loader: Any,
@@ -24,8 +14,8 @@ def train_model(
     patience: int,
     output_dir: str,
     device: torch.device,
-    apply_augment: bool,
     optimizer: Any,
+    **kwargs: Any,
 ):
     if patience > epochs:
         patience = epochs - 1
@@ -43,12 +33,7 @@ def train_model(
         for data, target in tqdm(train_loader, desc=desc):
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
-            # Apply augmentation if specified
-            if apply_augment:
-                data_aug = torch.stack([augment_image(img) for img in data])
-            else:
-                data_aug = data
-            outputs = model(data_aug)
+            outputs = model(data)
             loss = criterion(outputs, target)
 
             _, predicted = torch.max(outputs, 1)
@@ -62,7 +47,7 @@ def train_model(
         avg_train_loss = running_loss / len(train_loader)
         train_acc = correct / total
 
-        val_acc = test_model(model, val_loader, device)
+        _, val_acc = test_model(model, val_loader, device)
 
         train_losses.append(loss.item())
         acc_values.append(val_acc)
@@ -73,7 +58,7 @@ def train_model(
         )
 
         if val_acc > best_acc:
-            model_path = f"{output_dir}/model_best.pth"
+            model_path = f"{output_dir}/best_model.pth"
             print(
                 f"New best model with accuracy: {val_acc:.4f}, saving model... {model_path}"
             )

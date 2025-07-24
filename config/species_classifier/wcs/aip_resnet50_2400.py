@@ -1,14 +1,12 @@
 DATA_TRAIN_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier/wcs/train.csv"
 DATA_VAL_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier/wcs/val.csv"
 DATA_TEST_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier/wcs/test.csv"
-MODEL_NAME = "normal"
 MODEL = "AIPResNet50"
 OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/wcs"
 PATIENCE = 15
 NUM_CLASS = 10
 TRAIN_SIZE = 2400
 BATCH_SIZE = 16
-AUGMENT_IMAGE = True
 EPOCHS = 100
 TASK = "species-classifier"
 LEARNING_RATE_MODEL = 1e-4
