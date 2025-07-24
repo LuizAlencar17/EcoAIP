@@ -33,7 +33,6 @@ def train_yolo_model(
     device,
     optimizer,
     num_classes,
-    apply_augment,
     **kwargs,
 ):
     """

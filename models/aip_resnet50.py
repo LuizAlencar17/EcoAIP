@@ -14,9 +14,7 @@ class AIPResNet50(nn.Module):
 
     def forward(self, x):
         params = self.nlpp(x)
-        # Example: use sigmoid of last param as control
         control_signal = torch.sigmoid(params[:, -1])
-        # Apply DIP conditionally
         if control_signal.mean() > 0.5:  # You can customize threshold
             x = self.dip(x, params)
         logits = self.backbone(x)

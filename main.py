@@ -28,7 +28,6 @@ def detection_collate_fn(batch):
 
 def setup_dataloaders(config, task_type):
     """Encapsulates the creation of datasets and dataloaders to avoid repetition."""
-    print("debug 1", task_type)
     if task_type in [
         "animal-classifier",
         "species-classifier",
@@ -36,13 +35,11 @@ def setup_dataloaders(config, task_type):
     ]:
         DatasetClass = ClassificationDataset
         collate_fn = None
-        print("debug 2", task_type)
     else:
         DatasetClass = DetectionDataset
         # We assume the default collate_fn is sufficient if the dataset returns fixed-size tensors.
         # If not, a custom collate_fn should be passed here.
         collate_fn = detection_collate_fn
-        print("debug 3", task_type)
 
     # Common DataLoader parameters
     loader_params = {
