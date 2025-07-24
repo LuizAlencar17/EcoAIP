@@ -7,7 +7,7 @@ BBOX_IS_NORMALIZED: True
 DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/serengeti/test.csv
 DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/serengeti/train.csv
 DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/serengeti/val.csv
-EPOCHS: 2
+EPOCHS: 150
 IMAGE_SIZE: (640, 640)
 LEARNING_RATE_MODEL: 0.0001
 MODEL: Yolov11
@@ -16,245 +16,9 @@ OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
 PATIENCE: 20
 SEED: 42
 TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
+TEST_SIZE: 1000
+TRAIN_SIZE: 4800
+VAL_SIZE: 600
 
 Training model...
-Epoch 1/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2 [Train]:   0%|          | 0/3 [00:04<?, ?it/s, loss=123]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:04<00:08,  4.03s/it, loss=123]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:04<00:08,  4.03s/it, loss=93.1]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:04<00:01,  1.74s/it, loss=93.1]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:04<00:01,  1.74s/it, loss=72.6]Epoch 1/2 [Train]: 100%|██████████| 3/3 [00:04<00:00,  1.42s/it, loss=72.6]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.83it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  5.74it/s]
-
-Calculating mAP metrics...
-End of Epoch 1: Train Loss: 72.6337 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> New best validation mAP: 0.0000. Model saved.
-Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s, loss=126]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:00,  3.08it/s, loss=126]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:00,  3.08it/s, loss=94.2]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  4.48it/s, loss=94.2]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  4.48it/s, loss=78.6]Epoch 2/2 [Train]: 100%|██████████| 3/3 [00:00<00:00,  4.98it/s, loss=78.6]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  2.93it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  4.69it/s]
-
-Calculating mAP metrics...
-End of Epoch 2: Train Loss: 78.5827 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> No improvement. Patience: 1/20
-
-Training metrics saved to /data/luiz/dataset/EcoAIP/serengeti/detection-classifier/Yolov11_10/metrics.csv
-
-Arguments: Namespace(config='config.detectation_classifier.serengeti.yolov11_10000', mode='test')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: True
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/serengeti/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/serengeti/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/serengeti/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.0001
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/serengeti
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Testing model...
-Loading weights from /data/luiz/dataset/EcoAIP/serengeti/detection-classifier/Yolov11_10/best_model.pth
-Validation / Test:   0%|          | 0/3 [00:00<?, ?it/s]Validation / Test:  33%|███▎      | 1/3 [00:02<00:05,  2.89s/it]Validation / Test: 100%|██████████| 3/3 [00:03<00:00,  1.24it/s]Validation / Test: 100%|██████████| 3/3 [00:03<00:00,  1.02s/it]
-
-Calculating mAP metrics...
-Test result: {'map': tensor(0.), 'map_50': tensor(0.), 'map_75': tensor(0.), 'map_small': tensor(-1.), 'map_medium': tensor(-1.), 'map_large': tensor(0.), 'mar_1': tensor(0.), 'mar_10': tensor(0.), 'mar_100': tensor(0.), 'mar_small': tensor(-1.), 'mar_medium': tensor(-1.), 'mar_large': tensor(0.), 'map_per_class': tensor(0.), 'mar_100_per_class': tensor(0.)}
-
-Arguments: Namespace(config='config.detectation_classifier.wcs.yolov11_10000', mode='train')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: False
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.01
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/wcs
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Training model...
-Epoch 1/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2 [Train]:   0%|          | 0/3 [00:03<?, ?it/s, loss=47.1]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:03<00:07,  3.69s/it, loss=47.1]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:03<00:07,  3.69s/it, loss=47.5]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:03<00:01,  1.60s/it, loss=47.5]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:03<00:01,  1.60s/it, loss=40.7]Epoch 1/2 [Train]: 100%|██████████| 3/3 [00:03<00:00,  1.32s/it, loss=40.7]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.31it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  5.20it/s]
-
-Calculating mAP metrics...
-End of Epoch 1: Train Loss: 40.6919 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> New best validation mAP: 0.0000. Model saved.
-Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s, loss=46.6]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:01,  1.96it/s, loss=46.6]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:01,  1.96it/s, loss=47.5]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  3.36it/s, loss=47.5]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  3.36it/s, loss=39.9]Epoch 2/2 [Train]: 100%|██████████| 3/3 [00:00<00:00,  3.85it/s, loss=39.9]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.24it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  5.13it/s]
-
-Calculating mAP metrics...
-End of Epoch 2: Train Loss: 39.9149 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> No improvement. Patience: 1/20
-
-Training metrics saved to /data/luiz/dataset/EcoAIP/wcs/detection-classifier/Yolov11_10/metrics.csv
-
-Arguments: Namespace(config='config.detectation_classifier.wcs.yolov11_10000', mode='test')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: False
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.01
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/wcs
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Testing model...
-Loading weights from /data/luiz/dataset/EcoAIP/wcs/detection-classifier/Yolov11_10/best_model.pth
-Validation / Test:   0%|          | 0/3 [00:00<?, ?it/s]Validation / Test:  33%|███▎      | 1/3 [00:02<00:05,  2.96s/it]Validation / Test: 100%|██████████| 3/3 [00:03<00:00,  1.22it/s]Validation / Test: 100%|██████████| 3/3 [00:03<00:00,  1.05s/it]
-
-Calculating mAP metrics...
-Test result: {'map': tensor(0.), 'map_50': tensor(0.), 'map_75': tensor(0.), 'map_small': tensor(-1.), 'map_medium': tensor(0.), 'map_large': tensor(0.), 'mar_1': tensor(0.), 'mar_10': tensor(0.), 'mar_100': tensor(0.), 'mar_small': tensor(-1.), 'mar_medium': tensor(0.), 'mar_large': tensor(0.), 'map_per_class': tensor(0.), 'mar_100_per_class': tensor(0.)}
-
-Arguments: Namespace(config='config.detectation_classifier.wcs.yolov11_10000', mode='train')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: False
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.01
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/wcs
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Training model...
-Epoch 1/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2 [Train]:   0%|          | 0/3 [00:03<?, ?it/s, loss=47.8]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:03<00:06,  3.06s/it, loss=47.8]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:03<00:06,  3.06s/it, loss=48.5]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:03<00:01,  1.35s/it, loss=48.5]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:03<00:01,  1.35s/it, loss=41.4]Epoch 1/2 [Train]: 100%|██████████| 3/3 [00:03<00:00,  1.11s/it, loss=41.4]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.69it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  5.66it/s]
-
-Calculating mAP metrics...
-End of Epoch 1: Train Loss: 41.3616 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> New best validation mAP: 0.0000. Model saved.
-Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s, loss=46.2]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:00,  2.26it/s, loss=46.2]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:00,  2.26it/s, loss=47.4]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  3.71it/s, loss=47.4]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  3.71it/s, loss=39.8]Epoch 2/2 [Train]: 100%|██████████| 3/3 [00:00<00:00,  4.21it/s, loss=39.8]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.64it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  5.58it/s]
-
-Calculating mAP metrics...
-End of Epoch 2: Train Loss: 39.8283 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> No improvement. Patience: 1/20
-
-Training metrics saved to /data/luiz/dataset/EcoAIP/wcs/detection-classifier/Yolov11_10/metrics.csv
-
-Arguments: Namespace(config='config.detectation_classifier.wcs.yolov11_10000', mode='test')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: False
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/wcs/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.01
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/wcs
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Testing model...
-Loading weights from /data/luiz/dataset/EcoAIP/wcs/detection-classifier/Yolov11_10/best_model.pth
-Validation / Test:   0%|          | 0/3 [00:00<?, ?it/s]Validation / Test:  33%|███▎      | 1/3 [00:02<00:04,  2.44s/it]Validation / Test: 100%|██████████| 3/3 [00:02<00:00,  1.45it/s]Validation / Test: 100%|██████████| 3/3 [00:02<00:00,  1.15it/s]
-
-Calculating mAP metrics...
-Test result: {'map': tensor(0.), 'map_50': tensor(0.), 'map_75': tensor(0.), 'map_small': tensor(-1.), 'map_medium': tensor(0.), 'map_large': tensor(0.), 'mar_1': tensor(0.), 'mar_10': tensor(0.), 'mar_100': tensor(0.), 'mar_small': tensor(-1.), 'mar_medium': tensor(0.), 'mar_large': tensor(0.), 'map_per_class': tensor(0.), 'mar_100_per_class': tensor(0.)}
-
-Arguments: Namespace(config='config.detectation_classifier.nacti.yolov11_1200', mode='train')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: False
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/nacti/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/nacti/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/nacti/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.0001
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/nacti
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Training model...
-Epoch 1/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 1/2 [Train]:   0%|          | 0/3 [00:03<?, ?it/s, loss=58.5]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:03<00:06,  3.05s/it, loss=58.5]Epoch 1/2 [Train]:  33%|███▎      | 1/3 [00:03<00:06,  3.05s/it, loss=53.8]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:03<00:01,  1.34s/it, loss=53.8]Epoch 1/2 [Train]:  67%|██████▋   | 2/3 [00:03<00:01,  1.34s/it, loss=48.3]Epoch 1/2 [Train]: 100%|██████████| 3/3 [00:03<00:00,  1.11s/it, loss=48.3]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.13it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  4.79it/s]
-
-Calculating mAP metrics...
-End of Epoch 1: Train Loss: 48.3382 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> New best validation mAP: 0.0000. Model saved.
-Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s]Epoch 2/2 [Train]:   0%|          | 0/3 [00:00<?, ?it/s, loss=46.2]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:01,  1.78it/s, loss=46.2]Epoch 2/2 [Train]:  33%|███▎      | 1/3 [00:00<00:01,  1.78it/s, loss=60.8]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  3.18it/s, loss=60.8]Epoch 2/2 [Train]:  67%|██████▋   | 2/3 [00:00<00:00,  3.18it/s, loss=52.5]Epoch 2/2 [Train]: 100%|██████████| 3/3 [00:00<00:00,  3.63it/s, loss=52.5]
-Validation / Test:   0%|          | 0/2 [00:00<?, ?it/s]Validation / Test:  50%|█████     | 1/2 [00:00<00:00,  3.27it/s]Validation / Test: 100%|██████████| 2/2 [00:00<00:00,  5.14it/s]
-
-Calculating mAP metrics...
-End of Epoch 2: Train Loss: 52.5115 | Val Loss: 0.0000 | mAP@.50:.95: 0.0000 | mAP@.50: 0.0000
---> No improvement. Patience: 1/20
-
-Training metrics saved to /data/luiz/dataset/EcoAIP/nacti/detection-classifier/Yolov11_10/metrics.csv
-
-Arguments: Namespace(config='config.detectation_classifier.nacti.yolov11_1200', mode='test')
-
-Configuration Parameters:
-BATCH_SIZE: 4
-BBOX_IS_NORMALIZED: False
-DATA_TEST_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/nacti/test.csv
-DATA_TRAIN_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/nacti/train.csv
-DATA_VAL_CSV_PATH: /data/luiz/dataset/partitions/detection-classifier/nacti/val.csv
-EPOCHS: 2
-IMAGE_SIZE: (640, 640)
-LEARNING_RATE_MODEL: 0.0001
-MODEL: Yolov11
-NUM_CLASS: 1
-OUTPUT_DIR: /data/luiz/dataset/EcoAIP/nacti
-PATIENCE: 20
-SEED: 42
-TASK: detection-classifier
-TEST_SIZE: 10
-TRAIN_SIZE: 10
-VAL_SIZE: 6
-
-Testing model...
-Loading weights from /data/luiz/dataset/EcoAIP/nacti/detection-classifier/Yolov11_10/best_model.pth
-Validation / Test:   0%|          | 0/3 [00:00<?, ?it/s]Validation / Test:  33%|███▎      | 1/3 [00:01<00:02,  1.44s/it]Validation / Test: 100%|██████████| 3/3 [00:01<00:00,  2.35it/s]Validation / Test: 100%|██████████| 3/3 [00:01<00:00,  1.86it/s]
-
-Calculating mAP metrics...
-Test result: {'map': tensor(0.), 'map_50': tensor(0.), 'map_75': tensor(0.), 'map_small': tensor(-1.), 'map_medium': tensor(0.), 'map_large': tensor(0.), 'mar_1': tensor(0.), 'mar_10': tensor(0.), 'mar_100': tensor(0.), 'mar_small': tensor(-1.), 'mar_medium': tensor(0.), 'mar_large': tensor(0.), 'map_per_class': tensor(0.), 'mar_100_per_class': tensor(0.)}
+Epoch 1/150 [Train]:   0%|          | 0/1200 [00:00<?, ?it/s]Epoch 1/150 [Train]:   0%|          | 0/1200 [00:05<?, ?it/s, loss=50.5]Epoch 1/150 [Train]:   0%|          | 1/1200 [00:05<1:48:33,  5.43s/it, loss=50.5]Epoch 1/150 [Train]:   0%|          | 1/1200 [00:05<1:48:33,  5.43s/it, loss=48.7]Epoch 1/150 [Train]:   0%|          | 2/1200 [00:05<46:20,  2.32s/it, loss=48.7]  Epoch 1/150 [Train]:   0%|          | 2/1200 [00:05<46:20,  2.32s/it, loss=49.7]Epoch 1/150 [Train]:   0%|          | 3/1200 [00:05<26:25,  1.32s/it, loss=49.7]Epoch 1/150 [Train]:   0%|          | 3/1200 [00:05<26:25,  1.32s/it, loss=50.1]Epoch 1/150 [Train]:   0%|          | 4/1200 [00:05<17:11,  1.16it/s, loss=50.1]Epoch 1/150 [Train]:   0%|          | 4/1200 [00:06<17:11,  1.16it/s, loss=49.8]Epoch 1/150 [Train]:   0%|          | 5/1200 [00:06<12:02,  1.65it/s, loss=49.8]Epoch 1/150 [Train]:   0%|          | 5/1200 [00:06<12:02,  1.65it/s, loss=49.4]Epoch 1/150 [Train]:   0%|          | 6/1200 [00:06<08:56,  2.23it/s, loss=49.4]Epoch 1/150 [Train]:   0%|          | 6/1200 [00:06<08:56,  2.23it/s, loss=51]  Epoch 1/150 [Train]:   1%|          | 7/1200 [00:06<06:54,  2.88it/s, loss=51]Epoch 1/150 [Train]:   1%|          | 7/1200 [00:06<06:54,  2.88it/s, loss=60.4]Epoch 1/150 [Train]:   1%|          | 8/1200 [00:06<05:32,  3.59it/s, loss=60.4]Epoch 1/150 [Train]:   1%|          | 8/1200 [00:06<05:32,  3.59it/s, loss=60]  Epoch 1/150 [Train]:   1%|          | 9/1200 [00:06<04:42,  4.21it/s, loss=60]Epoch 1/150 [Train]:   1%|          | 9/1200 [00:06<04:42,  4.21it/s, loss=59.3]Epoch 1/150 [Train]:   1%|          | 10/1200 [00:06<04:09,  4.77it/s, loss=59.3]Epoch 1/150 [Train]:   1%|          | 10/1200 [00:06<04:09,  4.77it/s, loss=60.5]Epoch 1/150 [Train]:   1%|          | 11/1200 [00:06<03:46,  5.26it/s, loss=60.5]Epoch 1/150 [Train]:   1%|          | 11/1200 [00:07<03:46,  5.26it/s, loss=62.3]Epoch 1/150 [Train]:   1%|          | 12/1200 [00:07<03:30,  5.66it/s, loss=62.3]
