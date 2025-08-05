@@ -29,8 +29,8 @@ def train_model(
         running_loss = 0.0
         correct = 0
         total = 0
-        desc = f"Epoch {epoch+1}/{epochs}"
-        for data, target in tqdm(train_loader, desc=desc):
+        pbar_train = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}")
+        for data, target in pbar_train:
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
             outputs = model(data)
@@ -43,6 +43,7 @@ def train_model(
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
+            pbar_train.set_postfix(loss=running_loss / (pbar_train.n + 1))
 
         avg_train_loss = running_loss / len(train_loader)
         train_acc = correct / total

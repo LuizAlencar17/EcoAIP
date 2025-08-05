@@ -51,14 +51,130 @@ class CBAM(nn.Module):
         return x
 
 
-# -----------------------------
-# Improved DIP Module
-class ImprovedDIP(nn.Module):
-    def __init__(self, tone_L=8):
+# --------------------------------------------------------------------------
+# Sub-módulo: Multi-Head Self-Attention (MHSA) para o EnhancedNLPP
+# --------------------------------------------------------------------------
+class MHSA(nn.Module):
+    """
+    Implementa a Multi-Head Self-Attention para melhorar a extração de features globais.
+    """
+
+    def __init__(self, embed_dim, num_heads=4):
+        super().__init__()
+        self.num_heads = num_heads
+        self.head_dim = embed_dim // num_heads
+        assert (
+            self.head_dim * num_heads == embed_dim
+        ), "embed_dim must be divisible by num_heads"
+
+        self.scale = self.head_dim**-0.5
+        self.qkv = nn.Linear(embed_dim, embed_dim * 3)
+        self.proj = nn.Linear(embed_dim, embed_dim)
+
+    def forward(self, x):
+        B, N, C = x.shape  # Batch, SequenceLength, Channels(embed_dim)
+
+        # Gera Q, K, V e os divide em múltiplas cabeças
+        qkv = (
+            self.qkv(x)
+            .reshape(B, N, 3, self.num_heads, self.head_dim)
+            .permute(2, 0, 3, 1, 4)
+        )
+        q, k, v = qkv[0], qkv[1], qkv[2]
+
+        # Calcula a pontuação de atenção
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+
+        # Aplica a atenção aos valores (V)
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        return x
+
+
+# --------------------------------------------------------------------------
+# NLPP Aprimorado com MHSA
+# --------------------------------------------------------------------------
+class EnhancedNLPP(nn.Module):
+    """
+    NLPP aprimorado que incorpora Multi-Head Self-Attention (MHSA)
+    para uma melhor compreensão do contexto global da imagem.
+    """
+
+    def __init__(
+        self, out_features: int = 14, embed_dim: int = 256, num_heads: int = 4
+    ):
+        super().__init__()
+
+        self.feature_extractor = nn.Sequential(
+            nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool2d((1, 1)),  # Global average pooling
+        )
+
+        self.projection = nn.Linear(64, embed_dim)
+        self.mhsa = MHSA(embed_dim, num_heads)
+
+        self.fc = nn.Sequential(
+            nn.LayerNorm(embed_dim),
+            nn.Linear(embed_dim, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, out_features),
+            nn.Tanh(),  # Força a saída para o intervalo estável [-1, 1]
+        )
+
+    def forward(self, x):
+        # Redimensiona a imagem de entrada para um tamanho fixo
+        x = F.interpolate(x, size=(256, 256), mode="bilinear", align_corners=False)
+
+        # Extrai features iniciais
+        x = self.feature_extractor(x)  # Shape: [B, 64, 1, 1]
+        x = x.flatten(start_dim=1)  # Shape: [B, 64]
+
+        # Projeta para a dimensão de embedding e aplica MHSA
+        x = self.projection(x)  # Shape: [B, embed_dim]
+        x = x.unsqueeze(1)  # Shape: [B, 1, embed_dim] - Adiciona dimensão de sequência
+        x = self.mhsa(x)
+        x = x.squeeze(1)  # Shape: [B, embed_dim]
+
+        # Prediz os parâmetros finais
+        params = self.fc(x)
+        return params
+
+
+# --------------------------------------------------------------------------
+# DIP Aprimorado com Sharpening Diferenciável
+# --------------------------------------------------------------------------
+class EnhancedDIP(nn.Module):
+    """
+    Módulo DIP aprimorado com sharpening via kernel Gaussiano aprendível
+    e tone mapping avançado.
+    """
+
+    def __init__(self, tone_L: int = 8):
         super().__init__()
         self.tone_L = tone_L
 
+        # Kernel Gaussiano 3x3 para sharpening, não aprendível mas diferenciável
+        # Pode ser tornado aprendível removendo requires_grad=False
+        gaussian_kernel = torch.tensor(
+            [[1, 2, 1], [2, 4, 2], [1, 2, 1]], dtype=torch.float32
+        )
+        self.sharpen_kernel = (
+            (gaussian_kernel / gaussian_kernel.sum()).unsqueeze(0).unsqueeze(0)
+        )
+        self.sharpen_kernel = self.sharpen_kernel.repeat(
+            3, 1, 1, 1
+        )  # Aplica para cada canal de cor
+
     def tone_mapping(self, x, tone_params):
+        """
+        Implementa o tone mapping via função linear por partes (piecewise linear).
+        """
         out = torch.zeros_like(x)
         for k in range(self.tone_L):
             tk = tone_params[:, k].view(-1, 1, 1, 1)
@@ -67,83 +183,34 @@ class ImprovedDIP(nn.Module):
         return out
 
     def forward(self, x, params):
-        B, C, H, W = x.shape
-        x = torch.clamp(x, min=1e-6, max=1.0)  # Ensure no zeros/negatives
+        # Garante estabilidade na entrada
+        x = torch.clamp(x, min=1e-6, max=1.0)
 
-        # Clamp params for stability
-        gamma = torch.clamp(params[:, 0], min=0.5, max=2.0)
-        contrast = torch.clamp(params[:, 1], min=0.5, max=1.5)
-        wb = torch.clamp(params[:, 2:5], min=0.8, max=1.2).unsqueeze(-1).unsqueeze(-1)
-        tone = params[:, 5 : 5 + self.tone_L].unsqueeze(-1).unsqueeze(-1)
-        sharpen_factor = torch.sigmoid(params[:, -1]).view(-1, 1, 1, 1)
+        # Separa os parâmetros
+        gamma = params[:, 0].view(-1, 1, 1, 1)
+        contrast = params[:, 1].view(-1, 1, 1, 1)
+        wb = params[:, 2:5].view(-1, 3, 1, 1)
+        tone = params[:, 5 : 5 + self.tone_L]
+        sharpen_lambda = params[:, -1].view(-1, 1, 1, 1)
 
-        # Gamma correction
-        x = torch.pow(x, gamma.view(-1, 1, 1, 1))
+        # 1. Gamma Correction
+        x = torch.pow(x, gamma)
 
-        # Contrast adjustment
+        # 2. Contrast Adjustment
         lum = 0.27 * x[:, 0:1, :, :] + 0.67 * x[:, 1:2, :, :] + 0.06 * x[:, 2:3, :, :]
-        en = x * (0.5 * (1 - torch.cos(torch.pi * lum)) / (lum + 1e-3))  # Safer epsilon
-        x = contrast.view(-1, 1, 1, 1) * en + (1 - contrast.view(-1, 1, 1, 1)) * x
+        en = x * (0.5 * (1 - torch.cos(torch.pi * lum)) / (lum + 1e-6))
+        x = contrast * en + (1 - contrast) * x
 
-        # White balance
+        # 3. White Balance
         x = x * wb
 
-        # Tone adjustment
-        x = self.tone_mapping(x, tone.squeeze(-1).squeeze(-1))
+        # 4. Tone Adjustment
+        x = self.tone_mapping(x, tone)
 
-        # Differentiable Gaussian sharpening
-        kernel = torch.ones((C, 1, 3, 3), device=x.device, dtype=x.dtype) / 9.0
-        gaussian = F.conv2d(x, kernel, padding=1, groups=C)
-        x = x + sharpen_factor * (x - gaussian)
-
-        return torch.clamp(x, 0, 1)  # Final clamp
-
-
-# -----------------------------
-# Multi-head Self Attention for NLPP
-class MHSA(nn.Module):
-    def __init__(self, in_dim, heads=4):
-        super().__init__()
-        self.heads = heads
-        self.scale = (in_dim // heads) ** -0.5
-        self.qkv = nn.Linear(in_dim, in_dim * 3)
-        self.fc = nn.Linear(in_dim, in_dim)
-
-    def forward(self, x):
-        B, N, C = x.shape
-        qkv = self.qkv(x).reshape(B, N, 3, self.heads, C // self.heads)
-        q, k, v = qkv[:, :, 0], qkv[:, :, 1], qkv[:, :, 2]
-
-        dots = (q @ k.transpose(-2, -1)) * self.scale
-        dots = torch.clamp(dots, min=-50, max=50)  # Prevent overflow
-        attn = F.softmax(dots, dim=-1)
-
-        out = (attn @ v).transpose(1, 2).reshape(B, N, C)
-        return self.fc(out)
-
-
-# -----------------------------
-# Enhanced NLPP
-class EnhancedNLPP(nn.Module):
-    def __init__(self, out_dim=16, embed_dim=512, heads=4):
-        super().__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(3, 16, 3, stride=2, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, 3, stride=2, padding=1),
-            nn.ReLU(),
+        # 5. Sharpening Aprimorado (com kernel Gaussiano)
+        blurred = F.conv2d(
+            x, self.sharpen_kernel.to(x.device), padding="same", groups=3
         )
-        self.pool = nn.AdaptiveAvgPool2d((4, 4))  # (B,32,4,4)
-        self.flatten = nn.Flatten()
+        x = x + sharpen_lambda * (x - blurred)
 
-        self.mhsa = MHSA(in_dim=512, heads=heads)
-        self.fc = nn.Sequential(nn.Linear(512, 128), nn.ReLU(), nn.Linear(128, out_dim))
-
-    def forward(self, x):
-        x = F.interpolate(x, size=(64, 64))
-        x = self.conv(x)
-        x = self.pool(x)
-        x = self.flatten(x)  # shape (B, 512)
-        x = x.unsqueeze(1)  # (B,1,512)
-        x = self.mhsa(x).squeeze(1)  # (B,512)
-        return self.fc(x)
+        return torch.clamp(x, 0, 1)

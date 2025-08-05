@@ -3,119 +3,129 @@ import torch
 import torchvision
 import pandas as pd
 from tqdm import tqdm
-from typing import Any
+from typing import Any, Tuple
 from ultralytics.utils.ops import non_max_suppression
-from torchmetrics.detection import (
-    MeanAveragePrecision,
-)  # <--- NOVO: Importa a métrica de mAP
+from torchvision.ops import box_iou
 
 
 def test_yolo_model(
     model: Any,
     test_loader: Any,
     device: torch.device,
-    criterion: Any = None,
-    output_dir: str = "",
-):
-    model.model.eval()
+    output_dir: str = "",  ### NOVO: Parâmetro para controlar o salvamento do CSV
+) -> Tuple[int, float]:
+    """
+    Testa um modelo YOLO, calcula a média do IoU para as detecções correspondentes
+    e, opcionalmente, salva todas as predições em um arquivo CSV.
+    """
 
-    # --- NOVO: Instancia o objeto da métrica de mAP ---
-    # Ele irá acumular os resultados de todos os lotes
-    metric = MeanAveragePrecision(box_format="xyxy", class_metrics=True)
-    metric.to(device)
+    model.eval()
 
-    total_loss = 0.0
+    total_iou = 0.0
+    matched_detections_count = 0
     all_results_to_save = []
     image_counter = 0
 
     with torch.no_grad():
-        pbar = tqdm(test_loader, desc="Validation / Test")
+        pbar = tqdm(test_loader, desc="Calculando IoU Médio")
         for images, targets in pbar:
+
+            ### CORREÇÃO: Garante que 'targets' seja um tensor único ###
+            if isinstance(targets, list):
+                # Se o DataLoader retornou uma lista, converte para um tensor único.
+                if not targets or all(t.numel() == 0 for t in targets):
+                    targets = torch.tensor([])  # Lida com lotes vazios
+                else:
+                    # Adiciona o índice do lote (batch index) a cada tensor de alvo
+                    for i, t in enumerate(targets):
+                        # Cria uma coluna de índices e a concatena
+                        batch_idx = torch.full(
+                            (t.shape[0], 1), i, device=t.device, dtype=t.dtype
+                        )
+                        targets[i] = torch.cat([batch_idx, t], dim=1)
+                    targets = torch.cat(targets, 0)
+
+            # A partir daqui, 'targets' é garantidamente um tensor
+            if targets.numel() == 0:
+                if output_dir:
+                    image_counter += len(images)
+                continue
+
+            # Move o tensor para o dispositivo correto APÓS a concatenação
+            targets = targets.to(device)
             images = images.to(device)
             h, w = images.shape[2], images.shape[3]
 
-            # Formata os alvos (ground truth) para o formato do torchmetrics
-            gts = []
-            for target_per_image in targets:
-                # Desnormaliza as caixas delimitadoras se necessário
-                gt_boxes_xywh = target_per_image[:, 1:]
-                gt_boxes_xyxy = torchvision.ops.box_convert(
-                    gt_boxes_xywh, in_fmt="cxcywh", out_fmt="xyxy"
+            predictions_raw = model(images)
+            preds = non_max_suppression(
+                prediction=(
+                    predictions_raw[0]
+                    if isinstance(predictions_raw, tuple)
+                    else predictions_raw
                 )
+            )
+
+            # Itera sobre cada imagem no lote para calcular o IoU
+            for i, pred_per_image in enumerate(preds):
+                gt_indices = targets[:, 0] == i
+                gt_boxes_norm = targets[gt_indices][:, 2:]
+                gt_labels = targets[gt_indices][:, 1]
+
+                if gt_boxes_norm.numel() == 0:
+                    continue
+
+                gt_boxes_xyxy = torchvision.ops.box_convert(
+                    gt_boxes_norm, in_fmt="cxcywh", out_fmt="xyxy"
+                ).to(device)
                 gt_boxes_xyxy[:, [0, 2]] *= w
                 gt_boxes_xyxy[:, [1, 3]] *= h
 
-                gts.append(
-                    {
-                        "boxes": gt_boxes_xyxy.to(device),
-                        "labels": target_per_image[:, 0].to(torch.int32).to(device),
-                    }
-                )
+                if pred_per_image.numel() > 0:
+                    iou_matrix = box_iou(pred_per_image[:, :4], gt_boxes_xyxy)
+                    for pred_idx in range(len(pred_per_image)):
+                        label_matches = pred_per_image[pred_idx, 5] == gt_labels
+                        if not label_matches.any():
+                            continue
+                        iou_scores_for_pred = iou_matrix[pred_idx][label_matches]
+                        if iou_scores_for_pred.numel() > 0:
+                            max_iou, _ = torch.max(iou_scores_for_pred, dim=0)
+                            if max_iou.item() > 0.1:
+                                total_iou += max_iou.item()
+                                matched_detections_count += 1
 
-            # Realiza as predições
-            predictions_raw = model(images)
-            final_predictions = non_max_suppression(prediction=predictions_raw)
-
-            # Formata as predições para o formato do torchmetrics
-            preds = []
-            for pred_per_image in final_predictions:
-                preds.append(
-                    {
-                        "boxes": pred_per_image[:, :4],  # Formato xyxy
-                        "scores": pred_per_image[:, 4],  # Confiança
-                        "labels": pred_per_image[:, 5].to(torch.int32),  # Classe
-                    }
-                )
-
-            # --- NOVO: Atualiza a métrica com as predições e os alvos do lote atual ---
-            metric.update(preds, gts)
-
-            # O resto do código para calcular a loss e salvar predições permanece o mesmo
-            # (se você ainda precisar dele)
-            if criterion is not None:
-                batch = {
-                    "img": images,
-                    "batch_idx": torch.cat(
-                        [torch.full((len(t),), i) for i, t in enumerate(targets)]
-                    ).to(device),
-                    "cls": torch.cat([t[:, 0] for t in targets]).to(device),
-                    "bboxes": torch.cat([t[:, 1:] for t in targets]).to(device),
-                }
-                loss, _ = criterion(predictions_raw, batch)
-                total_loss += loss.item()
-
+            ### NOVO: Bloco para coletar os dados para o CSV ###
             if output_dir:
-                for i, pred in enumerate(final_predictions):
-                    if pred.shape[0] > 0:
+                for i, pred_per_image in enumerate(preds):
+                    if pred_per_image.shape[0] > 0:
+                        # Converte de xyxy (pixels) para cxcywh (normalizado) para salvar
                         pred_boxes_xywhn = torchvision.ops.box_convert(
-                            pred[:, :4], in_fmt="xyxy", out_fmt="cxcywh"
+                            pred_per_image[:, :4], in_fmt="xyxy", out_fmt="cxcywh"
                         )
                         pred_boxes_xywhn /= torch.tensor([w, h, w, h], device=device)
-                        for box_idx in range(pred.shape[0]):
+                        for box_idx in range(pred_per_image.shape[0]):
                             all_results_to_save.append(
                                 {
                                     "image_index": image_counter + i,
-                                    "class_id": int(pred[box_idx, 5]),
-                                    "confidence": float(pred[box_idx, 4]),
+                                    "class_id": int(pred_per_image[box_idx, 5]),
+                                    "confidence": float(pred_per_image[box_idx, 4]),
                                     "x_center": float(pred_boxes_xywhn[box_idx, 0]),
                                     "y_center": float(pred_boxes_xywhn[box_idx, 1]),
                                     "width": float(pred_boxes_xywhn[box_idx, 2]),
                                     "height": float(pred_boxes_xywhn[box_idx, 3]),
                                 }
                             )
-            image_counter += len(images)
+                image_counter += len(images)
 
-    # --- NOVO: Calcula o mAP final com base em todos os lotes processados ---
-    print("\nCalculating mAP metrics...")
-    final_metrics = metric.compute()
+    # Calcula a média final do IoU
+    mean_iou = (
+        total_iou / matched_detections_count if matched_detections_count > 0 else 0.0
+    )
 
-    avg_loss = total_loss / len(test_loader) if len(test_loader) > 0 else 0.0
-
+    ### NOVO: Bloco final para salvar o arquivo CSV ###
     if output_dir and all_results_to_save:
         results_df = pd.DataFrame(all_results_to_save)
-        csv_path = os.path.join(output_dir, "eval_results.csv")
+        csv_path = os.path.join(output_dir, "iou_eval_results.csv")
         results_df.to_csv(csv_path, index=False)
-        print(f"Test predictions saved to: '{csv_path}'")
+        print(f"\nPredições do teste salvas em: '{csv_path}'")
 
-    # --- NOVO: Retorna a loss e o dicionário de métricas do mAP ---
-    return avg_loss, final_metrics
+    return mean_iou

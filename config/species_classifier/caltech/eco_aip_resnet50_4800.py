@@ -1,0 +1,16 @@
+DATA_TRAIN_CSV_PATH = (
+    "/data/luiz/dataset/partitions/species-classifier/caltech/train.csv"
+)
+DATA_VAL_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier/caltech/val.csv"
+DATA_TEST_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier/caltech/test.csv"
+MODEL = "EcoAIPResNet50"
+OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/caltech"
+PATIENCE = 15
+NUM_CLASS = 10
+TRAIN_SIZE = 4800
+BATCH_SIZE = 16
+EPOCHS = 100
+TASK = "species-classifier"
+LEARNING_RATE_MODEL = 1e-4
+IMAGE_SIZE = (400, 400)
+SEED = 42

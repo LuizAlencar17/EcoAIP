@@ -13,9 +13,10 @@ class AIPResNet50(nn.Module):
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
 
     def forward(self, x):
+        # Etapa 1: Prediz os parâmetros com o NLPP aprimorado
         params = self.nlpp(x)
-        control_signal = torch.sigmoid(params[:, -1])
-        if control_signal.mean() > 0.5:  # You can customize threshold
-            x = self.dip(x, params)
-        logits = self.backbone(x)
+
+        # Etapa 2: Processa a imagem com o DIP aprimorado
+        enhanced_image = self.dip(x, params)
+        logits = self.backbone(enhanced_image)
         return logits

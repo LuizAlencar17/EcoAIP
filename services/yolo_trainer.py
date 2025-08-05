@@ -125,36 +125,29 @@ def train_yolo_model(
 
         # ATENÇÃO: test_yolo_model ainda calcula avg_iou, não mAP!
 
-        avg_val_loss, val_metrics = test_yolo_model(
+        val_metrics = test_yolo_model(
             model=model, test_loader=val_loader, device=device
         )
-
-        # Extrai e imprime as métricas principais
-        map_50_95 = val_metrics["map"].item()
-        map_50 = val_metrics["map_50"].item()
-        map_75 = val_metrics["map_75"].item()
 
         print(
             f"End of Epoch {epoch+1}: "
             f"Train Loss: {avg_train_loss:.4f} | "
-            f"Val Loss: {avg_val_loss:.4f} | "
-            f"mAP@.50:.95: {map_50_95:.4f} | "
-            f"mAP@.50: {map_50:.4f}"
+            f"IoU: {val_metrics:.4f}"
         )
 
         epoch_metrics = {
             "epoch": epoch + 1,
             "train_loss": avg_train_loss,
-            "val_map_50": map_50,
+            "iou": val_metrics,
             "lr": optimizer.param_groups[0]["lr"],
         }
         training_history.append(epoch_metrics)
 
         # --- Lógica de Early Stopping ---
-        if map_50 > best_metrics:
-            best_metrics = map_50
+        if val_metrics > best_metrics:
+            best_metrics = val_metrics
             torch.save(model.state_dict(), model_path)
-            print(f"--> New best validation mAP: {map_50:.4f}. Model saved.")
+            print(f"--> New best validation IoU: {val_metrics:.4f}. Model saved.")
             patience_counter = 0
         else:
             patience_counter += 1
