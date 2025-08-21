@@ -55,7 +55,8 @@ def setup_dataloaders(config, task_type):
     train_dataset = DatasetClass(
         csv_file=config.DATA_TRAIN_CSV_PATH,
         img_size=config.IMAGE_SIZE,
-        n=config.TRAIN_SIZE,
+        # n=config.TRAIN_SIZE,
+        n=2000,
         seed=config.SEED,
         is_train=True,
         bbox_is_normalized=config.BBOX_IS_NORMALIZED,
@@ -63,14 +64,16 @@ def setup_dataloaders(config, task_type):
     val_dataset = DatasetClass(
         csv_file=config.DATA_VAL_CSV_PATH,
         img_size=config.IMAGE_SIZE,
-        n=config.VAL_SIZE,
+        # n=config.VAL_SIZE,
+        n=400,
         seed=config.SEED,
         bbox_is_normalized=config.BBOX_IS_NORMALIZED,
     )
     test_dataset = DatasetClass(
         csv_file=config.DATA_TEST_CSV_PATH,
         img_size=config.IMAGE_SIZE,
-        n=config.TEST_SIZE,
+        # n=config.TEST_SIZE,
+        n=1500,
         seed=config.SEED,
         bbox_is_normalized=config.BBOX_IS_NORMALIZED,
     )
@@ -115,7 +118,8 @@ def main(args):
             model=model,
             train_loader=train_loader,
             val_loader=val_loader,
-            epochs=config.EPOCHS,
+            # epochs=config.EPOCHS,
+            epochs=150,
             patience=config.PATIENCE,
             output_dir=str(output_path),
             optimizer=optimizer,

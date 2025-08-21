@@ -1,5 +1,6 @@
 import os
 import torch
+import logging
 import pandas as pd
 from PIL import Image
 from torch.utils.data import Dataset
@@ -34,9 +35,9 @@ class ClassificationDataset(Dataset):
             )
 
         # Amostragem e preparação final do DataFrame
-        self.data_frame = self.data_frame.sample(
-            n=min(n, len(self.data_frame)), random_state=seed
-        ).reset_index(drop=True)
+        self.data_frame = self.data_frame.sample(n=n, random_state=seed).reset_index(
+            drop=True
+        )
         self.data_frame["label"] = self.data_frame["category"]
 
         self.train_transform = transforms.Compose(
@@ -45,9 +46,9 @@ class ClassificationDataset(Dataset):
                 transforms.RandomHorizontalFlip(),
                 transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
                 transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                ),
+                # transforms.Normalize(
+                #     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                # ),
             ]
         )
 
@@ -56,9 +57,9 @@ class ClassificationDataset(Dataset):
             [
                 transforms.Resize(img_size),
                 transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                ),
+                # transforms.Normalize(
+                #     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                # ),
             ]
         )
 
@@ -66,14 +67,18 @@ class ClassificationDataset(Dataset):
         return len(self.data_frame)
 
     def __getitem__(self, idx: int):
-        img_path = self.data_frame.iloc[idx]["path"]
-        image = Image.open(img_path).convert("RGB")
-        label = self.data_frame.iloc[idx]["label"]
+        try:
+            img_path = self.data_frame.iloc[idx]["path"]
+            image = Image.open(img_path).convert("RGB")
+            label = self.data_frame.iloc[idx]["label"]
 
-        # 3. Aplica a transformação correta baseada no modo (treino ou validação)
-        if self.is_train:
-            image = self.train_transform(image)
-        else:
-            image = self.val_transform(image)
+            # 3. Aplica a transformação correta baseada no modo (treino ou validação)
+            if self.is_train:
+                image = self.train_transform(image)
+            else:
+                image = self.val_transform(image)
 
-        return image, label
+            return image, label
+        except Exception as e:
+            logging.warn(f"Erro ao processar o índice {idx} {img_path}: {e}")
+            raise e
