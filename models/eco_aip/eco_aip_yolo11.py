@@ -4,9 +4,7 @@ from pathlib import Path
 from ultralytics import YOLO
 from ultralytics.nn.modules import Detect
 
-# from models.aip.aip_improved_modules import ZeroDCE_PlusPlus
 
-# from models.aip.aip_fast_modules import FastNLPP as EnhancedNLPP, FastDIP as EnhancedDIP
 from ultralytics.utils.torch_utils import initialize_weights
 
 
@@ -31,8 +29,7 @@ class EcoAIPYolov11(nn.Module):
             multi_scale_training (bool): Whether to use multi-scale training.
         """
         super().__init__()
-        # self.enhancer = ZeroDCE_PlusPlus()
-
+        # self.enhancer = ZeroDCEPlus()
         # --- Weight File Sanity Check ---
         weights_file = Path(model_name).resolve()
         if not weights_file.is_file():
@@ -76,20 +73,16 @@ class EcoAIPYolov11(nn.Module):
 
         # Replace the old head with the new one in the model
         self.model.model[-1] = new_head
+        self.idx = 0
 
-    def forward(self, x, *args, **kwargs):
-        """
-        x: [B,3,H,W] em [0,1].
-        Retorna exatamente o que o YOLO retornaria (lista/tensor de predições).
-        """
-        x = x.float().clamp(0.0, 1.0)
+    def forward(self, x, return_enhanced: bool = False):
+        x = x.float().clamp(0, 1)
+        # parte sensível roda bem em AMP; não precisamos desativar autocast
+        out = self.enhancer(x, return_aux=return_enhanced)
+        if return_enhanced:
+            y, aux = out
+        else:
+            y = out
 
-        # A DCE já é estável em AMP; se seu trainer usa autocast, o grad flui normal.
-        y, params = self.enhancer(x)  # y em [0,1]
-        gate = params["gate"]  # [B,1,H,W]
-        x = torch.clamp(x + gate * (y - x), 0, 1)
-
-        # x = y  # usa a imagem totalmente melhorada
-
-        # IMPORTANTÍSSIMO: retornar apenas as SAÍDAS do YOLO
-        return self.model(x, *args, **kwargs)
+        logits = self.model(y)
+        return (logits, y, aux) if return_enhanced else logits

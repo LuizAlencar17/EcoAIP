@@ -55,8 +55,7 @@ def setup_dataloaders(config, task_type):
     train_dataset = DatasetClass(
         csv_file=config.DATA_TRAIN_CSV_PATH,
         img_size=config.IMAGE_SIZE,
-        # n=config.TRAIN_SIZE,
-        n=2000,
+        n=config.TRAIN_SIZE,
         seed=config.SEED,
         is_train=True,
         bbox_is_normalized=config.BBOX_IS_NORMALIZED,
@@ -64,16 +63,14 @@ def setup_dataloaders(config, task_type):
     val_dataset = DatasetClass(
         csv_file=config.DATA_VAL_CSV_PATH,
         img_size=config.IMAGE_SIZE,
-        # n=config.VAL_SIZE,
-        n=400,
+        n=config.VAL_SIZE,
         seed=config.SEED,
         bbox_is_normalized=config.BBOX_IS_NORMALIZED,
     )
     test_dataset = DatasetClass(
         csv_file=config.DATA_TEST_CSV_PATH,
         img_size=config.IMAGE_SIZE,
-        # n=config.TEST_SIZE,
-        n=1500,
+        n=config.TEST_SIZE,
         seed=config.SEED,
         bbox_is_normalized=config.BBOX_IS_NORMALIZED,
     )
@@ -111,8 +108,9 @@ def main(args):
         if "serengeti" not in config.OUTPUT_DIR:
             print("\nLoading Serengeti weights...")
             weights_path = get_serengeti_model_path(config) / "best_model.pth"
-            model.load_state_dict(torch.load(weights_path), strict=False)
+            # model.load_state_dict(torch.load(weights_path), strict=False)
 
+        model.load_state_dict(torch.load(weights_path), strict=False)
         trainer_fn = train_yolo_model if "yolo" in config.MODEL.lower() else train_model
         trainer_fn(
             model=model,

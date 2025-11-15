@@ -20,11 +20,10 @@ def train_model(
         patience = epochs - 1
 
     is_eco_aip = "EcoAIP" in str(type(model))
-    if is_eco_aip:
-        optimizer = torch.optim.AdamW(
-            model.param_groups(lr_backbone=1e-4, lr_enhancer=3e-5)
-        )
-
+    # if is_eco_aip:
+    #     optimizer = torch.optim.AdamW(
+    #         model.param_groups(lr_backbone=1e-4, lr_enhancer=3e-5)
+    #     )
     criterion = torch.nn.CrossEntropyLoss()
     best_acc = -1
     current_patience = 0

@@ -1,0 +1,17 @@
+DATA_TRAIN_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier-cropped/ami/train.csv"
+DATA_VAL_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier-cropped/ami/val.csv"
+DATA_TEST_CSV_PATH = "/data/luiz/dataset/partitions/species-classifier-cropped/ami/test.csv"
+MODEL = "ResNet50"
+OUTPUT_DIR = "/data/luiz/dataset/EcoAIP/ami"
+PATIENCE = 20
+NUM_CLASS = 20
+TRAIN_SIZE = 1300
+VAL_SIZE = 680
+TEST_SIZE = 680
+BATCH_SIZE = 8
+BBOX_IS_NORMALIZED = False
+EPOCHS = 100
+TASK = "species-classifier-cropped"
+LEARNING_RATE_MODEL = 1e-4
+IMAGE_SIZE = (224, 224)
+SEED = 42
