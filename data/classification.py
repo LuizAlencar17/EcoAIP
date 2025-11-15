@@ -1,36 +1,12 @@
+import os
 import torch
+import logging
 import pandas as pd
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-import torchvision.transforms.functional as TF
 
 
-# 1. Crie uma classe para sua lógica de augmentation
-#    Isso encapsula a lógica da função em um formato que o transforms.Compose entende.
-class CustomAugmentations:
-    """Aplica uma série de augmentations com 50% de chance cada."""
-
-    def __call__(self, x):
-        # Ajuste de gamma
-        if torch.rand(1).item() > 0.5:
-            x = TF.adjust_gamma(x, gamma=torch.empty(1).uniform_(0.3, 2.0).item())
-
-        # Blur gaussiano
-        if torch.rand(1).item() > 0.5:
-            # O kernel deve ser de ímpares
-            x = TF.gaussian_blur(x, kernel_size=[3, 3])
-
-        # Adição de ruído
-        if torch.rand(1).item() > 0.5:
-            noise = torch.randn_like(x) * 0.05
-            x = x + noise
-
-        # Garante que os valores da imagem permaneçam no intervalo [0, 1]
-        return torch.clamp(x, 0, 1)
-
-
-# 2. Atualize a classe de Dataset para usar a augmentation
 class ClassificationDataset(Dataset):
     def __init__(
         self,
@@ -38,36 +14,71 @@ class ClassificationDataset(Dataset):
         img_size: tuple = (224, 224),
         n: int = 1000,
         seed: int = 42,
-        is_train: bool = False,  # Adicionado parâmetro para controlar a augmentation
+        is_train: bool = False,
         **kwargs,
     ):
-        self.data_frame = (
-            pd.read_csv(csv_file).sample(n=n, random_state=seed).reset_index(drop=True)
+        super().__init__()
+        self.is_train = is_train
+
+        # 1. Carrega e filtra o DataFrame para garantir que todos os arquivos existem
+        df_initial = pd.read_csv(csv_file)
+        print(f"Verificando {len(df_initial)} imagens listadas em '{csv_file}'...")
+
+        # Remove linhas com caminhos de imagem ausentes para evitar erros
+        original_len = len(df_initial)
+        df_initial["path_exists"] = df_initial["path"].apply(os.path.exists)
+        self.data_frame = df_initial[df_initial["path_exists"]].copy()
+
+        if len(self.data_frame) < original_len:
+            print(
+                f"AVISO: {original_len - len(self.data_frame)} imagens não encontradas foram removidas."
+            )
+
+        # Amostragem e preparação final do DataFrame
+        self.data_frame = self.data_frame.sample(n=n, random_state=seed).reset_index(
+            drop=True
         )
         self.data_frame["label"] = self.data_frame["category"]
 
-        # Cria a lista de transformações base
-        transform_list = [transforms.Resize(img_size), transforms.ToTensor()]
+        self.train_transform = transforms.Compose(
+            [
+                transforms.RandomResizedCrop(img_size, scale=(0.8, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+                transforms.ToTensor(),
+                # transforms.Normalize(
+                #     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                # ),
+            ]
+        )
 
-        if is_train:
-            transform_list.append(CustomAugmentations())
-
-        self.transform = transforms.Compose(transform_list)
+        # Pipeline de validação/teste sem augmentations aleatórias
+        self.val_transform = transforms.Compose(
+            [
+                transforms.Resize(img_size),
+                transforms.ToTensor(),
+                # transforms.Normalize(
+                #     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                # ),
+            ]
+        )
 
     def __len__(self) -> int:
         return len(self.data_frame)
 
     def __getitem__(self, idx: int):
-        img_path = self.data_frame.iloc[idx]["path"]
         try:
+            img_path = self.data_frame.iloc[idx]["path"]
             image = Image.open(img_path).convert("RGB")
-        except FileNotFoundError:
-            print(f"Arquivo não encontrado: {img_path}. Retornando None.")
-            return None, None  # Ou trate o erro como preferir
+            label = self.data_frame.iloc[idx]["label"]
 
-        label = self.data_frame.iloc[idx]["label"]
+            # 3. Aplica a transformação correta baseada no modo (treino ou validação)
+            if self.is_train:
+                image = self.train_transform(image)
+            else:
+                image = self.val_transform(image)
 
-        if self.transform:
-            image = self.transform(image)
-
-        return image, label
+            return image, label
+        except Exception as e:
+            logging.warn(f"Erro ao processar o índice {idx} {img_path}: {e}")
+            raise e

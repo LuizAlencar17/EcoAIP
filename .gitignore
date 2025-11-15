@@ -118,7 +118,7 @@ error.log
 # Temporary files
 *.tmp
 *.out
-nohup.out
+*nohup.out
 *.temp
 tmp/
 temp/

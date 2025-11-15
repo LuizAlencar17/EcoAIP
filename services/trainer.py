@@ -3,7 +3,6 @@ from tqdm import tqdm
 from typing import Any
 from utils.utils import save_metrics
 from services.tester import test_model
-from torchvision.transforms import functional as TF
 
 
 def train_model(
@@ -19,6 +18,12 @@ def train_model(
 ):
     if patience > epochs:
         patience = epochs - 1
+
+    is_eco_aip = "EcoAIP" in str(type(model))
+    # if is_eco_aip:
+    #     optimizer = torch.optim.AdamW(
+    #         model.param_groups(lr_backbone=1e-4, lr_enhancer=3e-5)
+    #     )
     criterion = torch.nn.CrossEntropyLoss()
     best_acc = -1
     current_patience = 0
@@ -29,8 +34,8 @@ def train_model(
         running_loss = 0.0
         correct = 0
         total = 0
-        desc = f"Epoch {epoch+1}/{epochs}"
-        for data, target in tqdm(train_loader, desc=desc):
+        pbar_train = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}")
+        for data, target in pbar_train:
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
             outputs = model(data)
@@ -43,6 +48,7 @@ def train_model(
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
+            pbar_train.set_postfix(loss=running_loss / (pbar_train.n + 1))
 
         avg_train_loss = running_loss / len(train_loader)
         train_acc = correct / total
